@@ -1,6 +1,8 @@
 package com.inventory_service.service;
 
 import com.inventory_service.entity.Inventory;
+import com.inventory_service.exception.InsufficientInventoryException;
+import com.inventory_service.exception.ProductNotFoundException;
 import com.inventory_service.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ public class InventoryService {
                 .productId(productId)
                 .availableQuantity(quantity)
                 .build();
+        } else {
+            inventory.setAvailableQuantity(inventory.getAvailableQuantity() + quantity);
         }
 
         return inventoryRepository.save(inventory);
@@ -37,10 +41,13 @@ public class InventoryService {
     public String reserveInventory(String productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
-            .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+            .orElseThrow(() ->
+                new ProductNotFoundException("Product not found: " + productId));
 
         if (inventory.getAvailableQuantity() < quantity) {
-            throw new RuntimeException("Insufficient inventory for product: " + productId);
+            throw new InsufficientInventoryException(
+                "Insufficient inventory for product: " + productId
+            );
         }
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantity);
@@ -52,7 +59,8 @@ public class InventoryService {
     public String releaseInventory(String productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
-            .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+            .orElseThrow(() ->
+                new ProductNotFoundException("Product not found: " + productId));
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() + quantity);
         inventoryRepository.save(inventory);
