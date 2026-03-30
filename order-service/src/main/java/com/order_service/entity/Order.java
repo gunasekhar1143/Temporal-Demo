@@ -28,6 +28,11 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Column(length = 100)
+    private String failureReason;
+
+    private Integer retryCount = 0;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -36,6 +41,10 @@ public class Order {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+
+        if (this.retryCount == null) {
+            this.retryCount = 0;
+        }
     }
 
     @PreUpdate

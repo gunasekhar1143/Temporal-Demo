@@ -1,15 +1,23 @@
 package com.order_service.service.client;
 
+import com.order_service.dto.RescheduleShipmentRequest;
+import com.order_service.dto.ScheduleShipmentRequest;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "shipping-service", url = "http://localhost:8083")
+@FeignClient(name = "shipment-service", url = "http://localhost:8083")
 public interface ShippingClient {
 
-    @PostMapping("/shipping/create")
-    String createShipment(@RequestParam Long orderId);
+    @PostMapping("/shipping/schedule")
+    String scheduleShipment(@RequestBody ScheduleShipmentRequest request);
 
-    @PostMapping("/shipping/cancel")
-    String cancelShipment(@RequestParam Long orderId);
+    @PutMapping("/shipping/reschedule/{orderId}")
+    String rescheduleShipment(@PathVariable Long orderId,
+        @RequestBody RescheduleShipmentRequest request);
+
+    @PutMapping("/shipping/ship/{orderId}")
+    String markAsShipped(@PathVariable Long orderId);
+
+    @PutMapping("/shipping/cancel/{orderId}")
+    String cancelShipment(@PathVariable Long orderId);
 }
