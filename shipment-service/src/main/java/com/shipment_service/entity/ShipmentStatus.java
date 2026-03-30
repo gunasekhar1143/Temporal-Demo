@@ -1,6 +1,9 @@
 package com.shipment_service.entity;
 
 public enum ShipmentStatus {
-    CREATED,
+    PENDING,
+    SCHEDULED,
+    SHIPPED,
+    DELIVERED,
     CANCELLED
 }
